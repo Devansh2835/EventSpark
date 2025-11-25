@@ -26,6 +26,9 @@ const eventSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    imagePublicId: {
+        type: String
+    },
     organiser: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

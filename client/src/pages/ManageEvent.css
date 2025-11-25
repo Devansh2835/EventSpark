@@ -55,6 +55,29 @@ textarea {
     display: block;
 }
 
+.image-upload-container {
+    margin-top: 8px;
+}
+
+.image-upload-label {
+    display: block;
+    padding: 32px;
+    border: 2px dashed var(--color-primary);
+    border-radius: var(--radius-md);
+    text-align: center;
+    cursor: pointer;
+    background: rgba(33, 128, 141, 0.02);
+    transition: all 0.3s ease;
+    font-weight: 600;
+    color: var(--color-primary);
+    user-select: none;
+}
+
+.image-upload-label:hover {
+    background: rgba(33, 128, 141, 0.08);
+    border-color: var(--color-primary-light);
+}
+
 .form-actions {
     display: flex;
     gap: 16px;

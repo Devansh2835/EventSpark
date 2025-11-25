@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
@@ -20,15 +20,7 @@ const EventDetails = () => {
 
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-    useEffect(() => {
-        fetchEvent();
-        if (user) {
-            checkRegistration();
-            checkIfOrganiser();
-        }
-    }, [id, user]);
-
-    const fetchEvent = async () => {
+    const fetchEvent = useCallback(async () => {
         try {
             const response = await axios.get(`${API_URL}/events/${id}`);
             setEvent(response.data);
@@ -38,9 +30,9 @@ const EventDetails = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [API_URL, id]);
 
-    const checkRegistration = async () => {
+    const checkRegistration = useCallback(async () => {
         try {
             const response = await axios.get(`${API_URL}/registrations/check/${id}`, {
                 withCredentials: true
@@ -49,9 +41,9 @@ const EventDetails = () => {
         } catch (error) {
             console.error('Error checking registration:', error);
         }
-    };
+    }, [API_URL, id]);
 
-    const checkIfOrganiser = async () => {
+    const checkIfOrganiser = useCallback(async () => {
         try {
             const response = await axios.get(`${API_URL}/events/${id}/is-organiser`, {
                 withCredentials: true
@@ -60,7 +52,17 @@ const EventDetails = () => {
         } catch (error) {
             console.error('Error checking organiser:', error);
         }
-    };
+    }, [API_URL, id]);
+
+    useEffect(() => {
+        fetchEvent();
+        if (user) {
+            checkRegistration();
+            checkIfOrganiser();
+        }
+    }, [id, user, fetchEvent, checkRegistration, checkIfOrganiser]);
+
+    
 
     const handleRegister = async () => {
         if (!user) {

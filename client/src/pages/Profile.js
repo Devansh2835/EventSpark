@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import axios from 'axios';
@@ -14,11 +14,7 @@ const Profile = () => {
 
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-    useEffect(() => {
-        fetchRegistrations();
-    }, []);
-
-    const fetchRegistrations = async () => {
+    const fetchRegistrations = useCallback(async () => {
         try {
             const response = await axios.get(`${API_URL}/registrations/my-registrations`, {
                 withCredentials: true
@@ -30,7 +26,12 @@ const Profile = () => {
         } finally {
             setLoading(false);
         }
-    };
+
+    }, [API_URL]);
+
+    useEffect(() => {
+        fetchRegistrations();
+    }, [fetchRegistrations]);
 
     if (loading) {
         return (

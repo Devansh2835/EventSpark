@@ -1,12 +1,17 @@
 const nodemailer = require('nodemailer');
 
+const EMAIL_USER = process.env.EMAIL_USER;
+const EMAIL_PASS = process.env.EMAIL_PASS;
+
+if (!EMAIL_USER || !EMAIL_PASS) {
+    console.error('EMAIL_USER and/or EMAIL_PASS not set. Set them in your .env (use an App Password for Gmail).');
+}
+
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
+    service: 'gmail',
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+        user: EMAIL_USER,
+        pass: EMAIL_PASS
     }
 });
 
@@ -35,6 +40,10 @@ const sendOTP = async (email, otp, name) => {
                 </div>
             `
         };
+
+        if (!EMAIL_USER || !EMAIL_PASS) {
+            throw new Error('EMAIL_USER or EMAIL_PASS is not configured. Set credentials in environment variables. For Gmail, use an App Password.');
+        }
 
         const info = await transporter.sendMail(mailOptions);
         console.log('OTP email sent:', info.messageId);
@@ -70,6 +79,10 @@ const sendEventRegistrationEmail = async (email, name, eventTitle, qrCodeUrl) =>
                 </div>
             `
         };
+
+        if (!EMAIL_USER || !EMAIL_PASS) {
+            throw new Error('EMAIL_USER or EMAIL_PASS is not configured. Set credentials in environment variables. For Gmail, use an App Password.');
+        }
 
         const info = await transporter.sendMail(mailOptions);
         console.log('Registration email sent:', info.messageId);

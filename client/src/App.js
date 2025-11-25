@@ -4,6 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -99,6 +100,8 @@ function App() {
                             } 
                         />
                     </Routes>
+                    <Footer />
+
                     <ToastContainer 
                         position="top-right"
                         autoClose={3000}

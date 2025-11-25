@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
@@ -12,6 +12,7 @@ const ManageEvent = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [deleting, setDeleting] = useState(false);
+    const [imageUploading, setImageUploading] = useState(false);
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -19,16 +20,13 @@ const ManageEvent = () => {
         time: '',
         venue: '',
         image: '',
+        imagePublicId: '',
         maxCapacity: 200
     });
 
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-    useEffect(() => {
-        fetchEvent();
-    }, [id]);
-
-    const fetchEvent = async () => {
+    const fetchEvent = useCallback(async () => {
         try {
             const response = await axios.get(`${API_URL}/events/${id}`);
             const event = response.data;
@@ -40,6 +38,7 @@ const ManageEvent = () => {
                 time: event.time,
                 venue: event.venue,
                 image: event.image,
+                imagePublicId: event.imagePublicId || '',
                 maxCapacity: event.maxCapacity
             });
         } catch (error) {
@@ -49,13 +48,56 @@ const ManageEvent = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [API_URL, id, navigate]);
+
+    useEffect(() => {
+        fetchEvent();
+    }, [fetchEvent]);
 
     const handleChange = (e) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
         });
+    };
+
+    const handleImageFileChange = async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        // Basic client-side check
+        if (!file.type.startsWith('image/')) {
+            toast.error('Please select an image file');
+            return;
+        }
+
+        const uploadUrl = `${API_URL}/events/upload`;
+
+        const data = new FormData();
+        data.append('image', file);
+
+        try {
+            setImageUploading(true);
+            const res = await axios.post(uploadUrl, data, {
+                withCredentials: true,
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            const imageUrl = res.data?.imageUrl || res.data?.secure_url || '';
+            const publicId = res.data?.publicId || res.data?.public_id || '';
+            if (imageUrl) {
+                setFormData(prev => ({ ...prev, image: imageUrl, imagePublicId: publicId }));
+                toast.success('Image uploaded');
+            } else {
+                toast.error('Upload succeeded but no URL returned');
+            }
+        } catch (err) {
+            console.error('Upload error:', err);
+            const message = err.response?.data?.error || 'Failed to upload image';
+            toast.error(message);
+        } finally {
+            setImageUploading(false);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -191,15 +233,27 @@ const ManageEvent = () => {
 
                         <div className="form-group">
                             <label htmlFor="image">Image URL (Cloudinary) *</label>
-                            <input
-                                type="url"
-                                id="image"
-                                name="image"
-                                value={formData.image}
-                                onChange={handleChange}
-                                placeholder="https://res.cloudinary.com/..."
-                                required
-                            />
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <input
+                                    type="url"
+                                    id="image"
+                                    name="image"
+                                    value={formData.image}
+                                    onChange={handleChange}
+                                    placeholder="https://res.cloudinary.com/..."
+                                    required
+                                    style={{ flex: 1 }}
+                                />
+                                <label className="btn btn-secondary" style={{ marginLeft: 8 }}>
+                                    {imageUploading ? 'Uploading...' : 'Upload'}
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageFileChange}
+                                        style={{ display: 'none' }}
+                                    />
+                                </label>
+                            </div>
                             {formData.image && (
                                 <div className="image-preview">
                                     <img src={formData.image} alt="Event preview" />

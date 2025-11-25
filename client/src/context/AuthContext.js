@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext();
@@ -17,12 +17,7 @@ export const AuthProvider = ({ children }) => {
 
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-    // Check if user is logged in on mount
-    useEffect(() => {
-        checkAuth();
-    }, []);
-
-    const checkAuth = async () => {
+    const checkAuth = useCallback(async () => {
         try {
             const response = await axios.get(`${API_URL}/auth/me`, {
                 withCredentials: true
@@ -33,7 +28,12 @@ export const AuthProvider = ({ children }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [API_URL]);
+
+    // Check if user is logged in on mount
+    useEffect(() => {
+        checkAuth();
+    }, [checkAuth]);
 
     const login = async (email, password) => {
         const response = await axios.post(`${API_URL}/auth/login`, 

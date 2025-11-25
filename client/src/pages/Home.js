@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import EventCard from '../components/EventCard';
@@ -11,11 +11,7 @@ const Home = () => {
 
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-    useEffect(() => {
-        fetchEvents();
-    }, []);
-
-    const fetchEvents = async () => {
+    const fetchEvents = useCallback(async () => {
         try {
             const response = await axios.get(`${API_URL}/events`);
             setEvents(response.data);
@@ -25,7 +21,11 @@ const Home = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [API_URL]);
+
+    useEffect(() => {
+        fetchEvents();
+    }, [fetchEvents]);
 
     if (loading) {
         return (

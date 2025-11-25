@@ -46,12 +46,6 @@ const Navbar = () => {
                 </button>
 
                 <div className={`navbar-menu ${mobileMenuOpen ? 'active' : ''}`}>
-                    <Link to="/" className="navbar-link" onClick={() => setMobileMenuOpen(false)}>
-                        <motion.span whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                            Home
-                        </motion.span>
-                    </Link>
-
                     {user ? (
                         <>
                             {user.role === 'admin' && (

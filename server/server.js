@@ -12,10 +12,33 @@ const registrationRoutes = require('./routes/registrations');
 const app = express();
 
 // Middleware
-app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true
-}));
+// CORS configuration
+if (process.env.NODE_ENV === 'production') {
+    app.use(cors({
+        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+        credentials: true
+    }));
+} else {
+    // In development allow any localhost origin (useful when CRA picks another port)
+    app.use(cors({
+        origin: (origin, callback) => {
+            // allow requests with no origin (like mobile apps or curl)
+            if (!origin) return callback(null, true);
+            try {
+                const url = new URL(origin);
+                if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+                    return callback(null, true);
+                }
+            } catch (err) {
+                // ignore parse errors
+            }
+            // fallback to environment config
+            if (origin === process.env.FRONTEND_URL) return callback(null, true);
+            callback(new Error('Not allowed by CORS'));
+        },
+        credentials: true
+    }));
+}
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

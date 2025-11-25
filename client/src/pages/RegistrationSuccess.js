@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
@@ -13,11 +13,7 @@ const RegistrationSuccess = () => {
 
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-    useEffect(() => {
-        fetchRegistration();
-    }, [id]);
-
-    const fetchRegistration = async () => {
+    const fetchRegistration = useCallback(async () => {
         try {
             const response = await axios.get(`${API_URL}/registrations/${id}`, {
                 withCredentials: true
@@ -29,7 +25,11 @@ const RegistrationSuccess = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [API_URL, id]);
+
+    useEffect(() => {
+        fetchRegistration();
+    }, [id, fetchRegistration]);
 
     if (loading) {
         return (
