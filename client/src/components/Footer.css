@@ -1,9 +1,8 @@
 .site-footer {
-  background: linear-gradient(135deg, #0f1724 0%, #1a2438 100%);
+  background: #0f1724;
   color: #e6eef8;
   padding: 36px 0;
   font-size: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .footer-container {
@@ -23,10 +22,6 @@
 .footer-brand .logo {
   font-weight: 700;
   font-size: 18px;
-  background: linear-gradient(135deg, #32b8c6 0%, #5fccd4 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .footer-brand .tagline {
@@ -59,27 +54,10 @@
   color: #cfe3fb;
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.footer-links a::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #32b8c6, #5fccd4);
-  transition: width 0.3s ease;
 }
 
 .footer-links a:hover {
-  color: #32b8c6;
-}
-
-.footer-links a:hover::after {
-  width: 100%;
+  text-decoration: underline;
 }
 
 .footer-bottom {

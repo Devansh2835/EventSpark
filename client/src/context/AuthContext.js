@@ -25,16 +25,16 @@ export const AuthProvider = ({ children }) => {
         const responseInterceptor = axios.interceptors.response.use(
             response => response,
             error => {
-                // Only suppress 401 errors from specific endpoints that are okay to fail silently
+                // Only silence 401s for optional endpoints used to check status
                 if (error.response?.status === 401) {
                     const url = error.config?.url || '';
-                    const silentEndpoints = ['registrations/check', 'events/'].includes(url);
-                    
-                    if (silentEndpoints || url.includes('/is-organiser')) {
-                        // Return resolved promise with error data so it doesn't throw
+
+                    // Treat unauthenticated as "not registered" / "not organiser" only for these checks
+                    if (url.includes('/registrations/check') || url.includes('/is-organiser')) {
                         return Promise.resolve({ data: { isRegistered: false, isOrganiser: false } });
                     }
                 }
+
                 return Promise.reject(error);
             }
         );

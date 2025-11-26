@@ -7,12 +7,6 @@
     background-size: cover;
     background-position: center;
     position: relative;
-    animation: zoom 8s ease-in-out infinite;
-}
-
-@keyframes zoom {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.02); }
 }
 
 .hero-overlay {
@@ -21,7 +15,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7));
+    background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
 }
 
 .event-details-content {
@@ -35,13 +29,12 @@
     background: var(--color-surface);
     padding: 40px;
     border-radius: var(--radius-lg);
-    box-shadow: 0 4px 20px rgba(33, 128, 141, 0.1);
+    box-shadow: var(--shadow-lg);
     margin-bottom: 40px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     gap: 24px;
-    border: 1px solid rgba(33, 128, 141, 0.05);
 }
 
 .event-header-main {
@@ -81,14 +74,8 @@
     background: var(--color-surface);
     padding: 32px;
     border-radius: var(--radius-lg);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
     margin-bottom: 24px;
-    border: 1px solid rgba(33, 128, 141, 0.05);
-    transition: all 0.3s ease;
-}
-
-.event-section:hover {
-    box-shadow: 0 6px 16px rgba(33, 128, 141, 0.08);
 }
 
 .section-heading {
@@ -144,10 +131,9 @@
     background: var(--color-surface);
     padding: 32px;
     border-radius: var(--radius-lg);
-    box-shadow: 0 4px 20px rgba(33, 128, 141, 0.1);
+    box-shadow: var(--shadow-sm);
     position: sticky;
     top: 90px;
-    border: 1px solid rgba(33, 128, 141, 0.05);
 }
 
 .capacity-badge {
