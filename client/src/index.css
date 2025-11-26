@@ -51,27 +51,51 @@ body {
     transition: all 0.2s ease;
     text-decoration: none;
     gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:active::before {
+    width: 300px;
+    height: 300px;
 }
 
 .btn-primary {
-    background: var(--color-primary);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
     color: white;
+    box-shadow: 0 4px 15px rgba(33, 128, 141, 0.3);
 }
 
 .btn-primary:hover {
-    background: var(--color-primary-hover);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, var(--color-primary-hover), var(--color-primary));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(33, 128, 141, 0.4);
 }
 
 .btn-secondary {
     background: transparent;
     border: 1px solid var(--color-border);
     color: var(--color-text);
+    transition: all 0.2s ease;
 }
 
 .btn-secondary:hover {
-    background: rgba(33, 128, 141, 0.05);
+    background: linear-gradient(135deg, rgba(33, 128, 141, 0.05), rgba(50, 184, 198, 0.05));
+    border-color: var(--color-primary);
+    color: var(--color-primary);
 }
 
 .btn:disabled {
@@ -87,26 +111,40 @@ input, textarea, select {
     border-radius: var(--radius-md);
     font-size: 16px;
     font-family: inherit;
-    transition: border-color 0.2s ease;
+    transition: all 0.2s ease;
     background: var(--color-surface);
+}
+
+input::placeholder, textarea::placeholder {
+    color: rgba(19, 66, 82, 0.4);
 }
 
 input:focus, textarea:focus, select:focus {
     outline: none;
     border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(33, 128, 141, 0.1);
+    background: var(--color-surface);
+}
+
+input:disabled, textarea:disabled, select:disabled {
+    background: rgba(19, 66, 82, 0.02);
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .card {
     background: var(--color-surface);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(33, 128, 141, 0.05);
 }
 
 .card:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(33, 128, 141, 0.12);
+    transform: translateY(-4px);
+    border-color: rgba(33, 128, 141, 0.15);
 }
 
 .loading {
@@ -114,6 +152,7 @@ input:focus, textarea:focus, select:focus {
     justify-content: center;
     align-items: center;
     min-height: 200px;
+    padding: 40px;
 }
 
 .spinner {
@@ -123,10 +162,51 @@ input:focus, textarea:focus, select:focus {
     border-top-color: var(--color-primary);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
+    box-shadow: 0 0 0 2px rgba(33, 128, 141, 0.05);
 }
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
 }
 
 .error-message {
