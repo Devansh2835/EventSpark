@@ -35,8 +35,18 @@ This is a full-stack event management application with:
 
 #### 3. Set Up Email Service
 
-- Gmail App Password (or use your email provider)
-- Get: `EMAIL_USER`, `EMAIL_PASS`
+- Preferred: Use an API-based transactional email provider (SendGrid, Mailgun, Postmark). These providers expose a Web API which is reliable on hosted platforms.
+
+  - If using SendGrid, set: `SENDGRID_API_KEY` (recommended for Render/Vercel)
+
+- SMTP option (less reliable on some hosts):
+  - `EMAIL_HOST` (e.g. `smtp.gmail.com`)
+  - `EMAIL_PORT` (e.g. `587`)
+  - `EMAIL_SECURE` (`true` for port 465, otherwise `false`)
+  - `EMAIL_USER` (SMTP username / from address)
+  - `EMAIL_PASS` (SMTP password or app password)
+
+Note: Some hosting providers (including Render) block outbound SMTP ports by default which causes timeouts like `ETIMEDOUT` when using Nodemailer SMTP. If you see timeouts in the logs, switch to a Web API provider such as SendGrid and set `SENDGRID_API_KEY` instead. See Render docs: https://render.com/docs/mail
 
 #### 4. Deploy to Render
 
