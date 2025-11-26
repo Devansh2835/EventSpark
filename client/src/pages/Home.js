@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import EventCard from '../components/EventCard';
-import AuthTest from '../components/AuthTest';
 import { toast } from 'react-toastify';
 import './Home.css';
 
@@ -65,8 +64,6 @@ const Home = () => {
                     </motion.p>
                 </div>
             </motion.div>
-
-            <AuthTest />
 
             <div className="container">
                 <motion.div 

@@ -97,6 +97,21 @@ router.post('/', isAuthenticated, async (req, res) => {
     }
 });
 
+// Check if user is registered for an event (Must come before /:id to avoid route conflict)
+router.get('/check/:eventId', isAuthenticated, async (req, res) => {
+    try {
+        const registration = await Registration.findOne({
+            user: req.session.userId,
+            event: req.params.eventId
+        });
+
+        res.json({ isRegistered: !!registration, registration });
+    } catch (error) {
+        console.error('Error checking registration:', error);
+        res.status(500).json({ error: 'Failed to check registration' });
+    }
+});
+
 // Get user's registrations
 router.get('/my-registrations', isAuthenticated, async (req, res) => {
     try {
@@ -164,21 +179,6 @@ router.delete('/:id', isAuthenticated, async (req, res) => {
     } catch (error) {
         console.error('Error cancelling registration:', error);
         res.status(500).json({ error: 'Failed to cancel registration' });
-    }
-});
-
-// Check if user is registered for an event
-router.get('/check/:eventId', isAuthenticated, async (req, res) => {
-    try {
-        const registration = await Registration.findOne({
-            user: req.session.userId,
-            event: req.params.eventId
-        });
-
-        res.json({ isRegistered: !!registration, registration });
-    } catch (error) {
-        console.error('Error checking registration:', error);
-        res.status(500).json({ error: 'Failed to check registration' });
     }
 });
 

@@ -81,6 +81,24 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Check if user is organiser (Must come before /:id to avoid route conflict)
+router.get('/:id/is-organiser', isAuthenticated, async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id);
+
+        if (!event) {
+            return res.status(404).json({ error: 'Event not found' });
+        }
+
+        const isOrganiser = event.organiser.toString() === req.session.userId && req.session.role === 'admin';
+
+        res.json({ isOrganiser });
+    } catch (error) {
+        console.error('Error checking organiser:', error);
+        res.status(500).json({ error: 'Failed to check organiser status' });
+    }
+});
+
 // Get single event
 router.get('/:id', async (req, res) => {
     try {
@@ -214,24 +232,6 @@ router.delete('/:id', isAuthenticated, isAdmin, async (req, res) => {
     } catch (error) {
         console.error('Error deleting event:', error);
         res.status(500).json({ error: 'Failed to delete event' });
-    }
-});
-
-// Check if user is organiser
-router.get('/:id/is-organiser', isAuthenticated, async (req, res) => {
-    try {
-        const event = await Event.findById(req.params.id);
-
-        if (!event) {
-            return res.status(404).json({ error: 'Event not found' });
-        }
-
-        const isOrganiser = event.organiser.toString() === req.session.userId && req.session.role === 'admin';
-
-        res.json({ isOrganiser });
-    } catch (error) {
-        console.error('Error checking organiser:', error);
-        res.status(500).json({ error: 'Failed to check organiser status' });
     }
 });
 

@@ -35,8 +35,6 @@ const EventDetails = () => {
     }, [API_URL, id]);
 
     const checkRegistration = useCallback(async () => {
-        if (!user) return;
-        
         try {
             const response = await axios.get(`${API_URL}/registrations/check/${id}`, {
                 withCredentials: true
@@ -44,17 +42,10 @@ const EventDetails = () => {
             setIsRegistered(response.data.isRegistered);
         } catch (error) {
             console.error('Error checking registration:', error);
-            // If unauthorized, redirect to login
-            if (error.response?.status === 401) {
-                toast.info('Please login to check registration status');
-                setIsRegistered(false);
-            }
         }
-    }, [API_URL, id, user]);
+    }, [API_URL, id]);
 
     const checkIfOrganiser = useCallback(async () => {
-        if (!user) return;
-        
         try {
             const response = await axios.get(`${API_URL}/events/${id}/is-organiser`, {
                 withCredentials: true
@@ -62,9 +53,8 @@ const EventDetails = () => {
             setIsOrganiser(response.data.isOrganiser);
         } catch (error) {
             console.error('Error checking organiser:', error);
-            setIsOrganiser(false);
         }
-    }, [API_URL, id, user]);
+    }, [API_URL, id]);
 
     useEffect(() => {
         fetchEvent();
@@ -94,14 +84,7 @@ const EventDetails = () => {
             navigate(`/registration-success/${response.data.registration._id}`);
         } catch (error) {
             const message = error.response?.data?.error || 'Registration failed';
-            
-            // Handle specific authentication errors
-            if (error.response?.status === 401) {
-                toast.error('Please login to register for this event');
-                navigate('/login');
-            } else {
-                toast.error(message);
-            }
+            toast.error(message);
         } finally {
             setRegistering(false);
         }
