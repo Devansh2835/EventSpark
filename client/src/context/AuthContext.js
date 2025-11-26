@@ -27,8 +27,16 @@ export const AuthProvider = ({ children }) => {
             });
             setUser(response.data.user);
         } catch (error) {
-            // Silently fail - user just not logged in
-            setUser(null);
+            // Silently fail only for 401 (not logged in)
+            // Log other errors for debugging
+            if (error.response?.status === 401) {
+                // User not logged in - this is expected
+                setUser(null);
+            } else {
+                // Other errors - log for debugging
+                console.error('Auth check error:', error);
+                setUser(null);
+            }
         } finally {
             setLoading(false);
         }
@@ -40,12 +48,17 @@ export const AuthProvider = ({ children }) => {
     }, [checkAuth]);
 
     const login = async (email, password) => {
-        const response = await axios.post(`${API_URL}/auth/login`, 
-            { email, password },
-            { withCredentials: true }
-        );
-        setUser(response.data.user);
-        return response.data;
+        try {
+            const response = await axios.post(`${API_URL}/auth/login`, 
+                { email, password },
+                { withCredentials: true }
+            );
+            setUser(response.data.user);
+            return response.data;
+        } catch (error) {
+            // Re-throw the error so the calling component can handle it
+            throw error;
+        }
     };
 
     const register = async (name, email, password, role) => {

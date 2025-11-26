@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useAuth } from '../context/AuthContext';
 import './ManageEvent.css';
 
 const CreateEvent = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [formData, setFormData] = useState({
@@ -23,6 +25,21 @@ const CreateEvent = () => {
     const [imagePreview, setImagePreview] = useState(null);
 
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+
+    // Check if user is logged in and has admin role
+    useEffect(() => {
+        if (!user) {
+            toast.info('Please login to create events');
+            navigate('/login');
+            return;
+        }
+        
+        if (user.role !== 'admin') {
+            toast.error('Only administrators can create events');
+            navigate('/');
+            return;
+        }
+    }, [user, navigate]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -93,7 +110,17 @@ const CreateEvent = () => {
         } catch (error) {
             console.error('Create error:', error);
             const msg = error.response?.data?.error || 'Failed to create event';
-            toast.error(msg);
+            
+            // Handle specific authentication errors
+            if (error.response?.status === 401) {
+                toast.error('Please login to create events');
+                navigate('/login');
+            } else if (error.response?.status === 403) {
+                toast.error('Only administrators can create events');
+                navigate('/');
+            } else {
+                toast.error(msg);
+            }
         } finally {
             setSaving(false);
         }

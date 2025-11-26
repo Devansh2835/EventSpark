@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # College Event Manager - Full Stack MERN Application
 
 A complete event management system for colleges where students can browse and register for events, and admins can manage events.
@@ -357,3 +358,6 @@ For issues or questions, check:
 **Built with ❤️ using MERN Stack**
 
 Enjoy managing your college events! 🎉
+=======
+WEB DEV ASSIGNMENT 2
+>>>>>>> aeab84e8b6bc10557bbc5e95a03f718b55c0f6e1

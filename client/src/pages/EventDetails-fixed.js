@@ -10,7 +10,7 @@ import './EventDetails.css';
 const EventDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, checkAuth } = useAuth();
 
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -74,8 +74,6 @@ const EventDetails = () => {
         }
     }, [id, user, fetchEvent, checkRegistration, checkIfOrganiser]);
 
-    
-
     const handleRegister = async () => {
         if (!user) {
             toast.info('Please login to register for events');
@@ -128,6 +126,7 @@ const EventDetails = () => {
 
     const isEventFull = event.registeredStudents?.length >= event.maxCapacity;
     const spotsLeft = event.maxCapacity - (event.registeredStudents?.length || 0);
+    
     return (
         <div className="event-details-page">
             <motion.div
