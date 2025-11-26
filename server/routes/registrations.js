@@ -98,8 +98,15 @@ router.post('/', isAuthenticated, async (req, res) => {
 });
 
 // Check if user is registered for an event (Must come before /:id to avoid route conflict)
-router.get('/check/:eventId', isAuthenticated, async (req, res) => {
+// Check if user is registered for an event (Must come before /:id to avoid route conflict)
+// Optional authentication - works for both authenticated and unauthenticated users
+router.get('/check/:eventId', async (req, res) => {
     try {
+        // If not authenticated, return false
+        if (!req.session || !req.session.userId) {
+            return res.json({ isRegistered: false, registration: null });
+        }
+
         const registration = await Registration.findOne({
             user: req.session.userId,
             event: req.params.eventId
@@ -108,7 +115,7 @@ router.get('/check/:eventId', isAuthenticated, async (req, res) => {
         res.json({ isRegistered: !!registration, registration });
     } catch (error) {
         console.error('Error checking registration:', error);
-        res.status(500).json({ error: 'Failed to check registration' });
+        res.json({ isRegistered: false, registration: null });
     }
 });
 

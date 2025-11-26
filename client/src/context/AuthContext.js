@@ -20,13 +20,45 @@ export const AuthProvider = ({ children }) => {
     // Configure axios defaults for credentials
     axios.defaults.withCredentials = true;
 
+    // Setup axios interceptor to handle 401 responses
+    useEffect(() => {
+        const responseInterceptor = axios.interceptors.response.use(
+            response => response,
+            error => {
+                // Only suppress 401 errors from specific endpoints that are okay to fail silently
+                if (error.response?.status === 401) {
+                    const url = error.config?.url || '';
+                    const silentEndpoints = ['registrations/check', 'events/'].includes(url);
+                    
+                    if (silentEndpoints || url.includes('/is-organiser')) {
+                        // Return resolved promise with error data so it doesn't throw
+                        return Promise.resolve({ data: { isRegistered: false, isOrganiser: false } });
+                    }
+                }
+                return Promise.reject(error);
+            }
+        );
+
+        return () => {
+            axios.interceptors.response.eject(responseInterceptor);
+        };
+    }, []);
+
     const checkAuth = useCallback(async () => {
         try {
             const response = await axios.get(`${API_URL}/auth/me`, {
-                withCredentials: true
+                withCredentials: true,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             });
-            setUser(response.data.user);
+            if (response.data && response.data.user) {
+                setUser(response.data.user);
+            } else {
+                setUser(null);
+            }
         } catch (error) {
+            console.error('Auth check error:', error);
             // Silently fail - user just not logged in
             setUser(null);
         } finally {

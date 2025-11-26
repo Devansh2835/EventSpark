@@ -82,7 +82,9 @@ router.get('/', async (req, res) => {
 });
 
 // Check if user is organiser (Must come before /:id to avoid route conflict)
-router.get('/:id/is-organiser', isAuthenticated, async (req, res) => {
+// Check if user is organiser (Must come before /:id to avoid route conflict)
+// Optional authentication - works for both authenticated and unauthenticated users
+router.get('/:id/is-organiser', async (req, res) => {
     try {
         const event = await Event.findById(req.params.id);
 
@@ -90,12 +92,17 @@ router.get('/:id/is-organiser', isAuthenticated, async (req, res) => {
             return res.status(404).json({ error: 'Event not found' });
         }
 
+        // If not authenticated, return false
+        if (!req.session || !req.session.userId) {
+            return res.json({ isOrganiser: false });
+        }
+
         const isOrganiser = event.organiser.toString() === req.session.userId && req.session.role === 'admin';
 
         res.json({ isOrganiser });
     } catch (error) {
         console.error('Error checking organiser:', error);
-        res.status(500).json({ error: 'Failed to check organiser status' });
+        res.json({ isOrganiser: false });
     }
 });
 

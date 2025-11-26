@@ -35,26 +35,38 @@ const EventDetails = () => {
     }, [API_URL, id]);
 
     const checkRegistration = useCallback(async () => {
+        if (!user) return;
         try {
             const response = await axios.get(`${API_URL}/registrations/check/${id}`, {
                 withCredentials: true
             });
             setIsRegistered(response.data.isRegistered);
         } catch (error) {
-            console.error('Error checking registration:', error);
+            if (error.response?.status === 401) {
+                console.log('User not authenticated for registration check');
+                setIsRegistered(false);
+            } else {
+                console.error('Error checking registration:', error);
+            }
         }
-    }, [API_URL, id]);
+    }, [API_URL, id, user]);
 
     const checkIfOrganiser = useCallback(async () => {
+        if (!user) return;
         try {
             const response = await axios.get(`${API_URL}/events/${id}/is-organiser`, {
                 withCredentials: true
             });
             setIsOrganiser(response.data.isOrganiser);
         } catch (error) {
-            console.error('Error checking organiser:', error);
+            if (error.response?.status === 401) {
+                console.log('User not authenticated for organiser check');
+                setIsOrganiser(false);
+            } else {
+                console.error('Error checking organiser:', error);
+            }
         }
-    }, [API_URL, id]);
+    }, [API_URL, id, user]);
 
     useEffect(() => {
         fetchEvent();
