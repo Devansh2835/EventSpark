@@ -13,7 +13,9 @@ const Home = () => {
 
     const fetchEvents = useCallback(async () => {
         try {
-            const response = await axios.get(`${API_URL}/events`);
+            const response = await axios.get(`${API_URL}/events`, {
+                withCredentials: true
+            });
             setEvents(response.data);
         } catch (error) {
             console.error('Error fetching events:', error);

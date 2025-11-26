@@ -17,6 +17,9 @@ export const AuthProvider = ({ children }) => {
 
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
+    // Configure axios defaults for credentials
+    axios.defaults.withCredentials = true;
+
     const checkAuth = useCallback(async () => {
         try {
             const response = await axios.get(`${API_URL}/auth/me`, {
@@ -24,6 +27,7 @@ export const AuthProvider = ({ children }) => {
             });
             setUser(response.data.user);
         } catch (error) {
+            // Silently fail - user just not logged in
             setUser(null);
         } finally {
             setLoading(false);

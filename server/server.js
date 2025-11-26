@@ -26,62 +26,74 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Middleware
-// CORS configuration
-if (process.env.NODE_ENV === 'production') {
-    // In production, allow the configured FRONTEND_URL and vercel deployments.
-    // This helps when the frontend is deployed to a vercel.app domain but
-    // FRONTEND_URL wasn't updated yet in the Render environment.
-    const configuredFrontend = process.env.FRONTEND_URL || '';
-    console.log('Configured FRONTEND_URL:', configuredFrontend);
+// CORS configuration - Critical for Vercel (frontend) to Render (backend) communication
+const allowedOrigins = [
+    // Development
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://127.0.0.1:3000',
+    // Production - Allow Vercel deployments
+    /^https:\/\/.*\.vercel\.app$/,
+];
 
+// Add configured frontend URL if provided
+const configuredFrontend = process.env.FRONTEND_URL;
+if (configuredFrontend) {
+    allowedOrigins.push(configuredFrontend);
+    console.log('CORS: Added configured FRONTEND_URL:', configuredFrontend);
+}
+
+if (process.env.NODE_ENV === 'production') {
     app.use(cors({
         origin: (origin, callback) => {
-            // allow requests with no origin (curl, server-to-server)
+            // Allow requests with no origin (server-to-server, curl, Postman)
             if (!origin) return callback(null, true);
+            
             try {
-                const url = new URL(origin);
-                const hostname = url.hostname;
+                // Check against allowed origins
+                const isAllowed = allowedOrigins.some(allowed => {
+                    if (allowed instanceof RegExp) {
+                        return allowed.test(origin);
+                    }
+                    return allowed === origin;
+                });
 
-                // Allow explicitly configured frontend origin
-                if (configuredFrontend && origin === configuredFrontend) {
-                    return callback(null, true);
-                }
-
-                // Allow Vercel preview/production domains (endsWith .vercel.app)
-                if (hostname.endsWith('.vercel.app')) {
-                    return callback(null, true);
-                }
-
-                // Allow localhost/127.0.0.1 during dev testing
-                if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                if (isAllowed) {
                     return callback(null, true);
                 }
             } catch (err) {
-                // ignore parse errors
+                console.error('CORS check error:', err);
             }
+            
+            console.warn('CORS blocked request from:', origin);
             callback(new Error('Not allowed by CORS'));
         },
-        credentials: true
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+        optionsSuccessStatus: 200
     }));
 } else {
-    // In development allow any localhost origin (useful when CRA picks another port)
+    // In development, be more permissive
     app.use(cors({
         origin: (origin, callback) => {
-            // allow requests with no origin (like mobile apps or curl)
             if (!origin) return callback(null, true);
             try {
                 const url = new URL(origin);
+                // Allow localhost in development
                 if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
                     return callback(null, true);
                 }
             } catch (err) {
                 // ignore parse errors
             }
-            // fallback to environment config
-            if (origin === process.env.FRONTEND_URL) return callback(null, true);
-            callback(new Error('Not allowed by CORS'));
+            // Also allow configured frontend
+            if (origin === configuredFrontend) return callback(null, true);
+            callback(null, true); // More permissive in dev
         },
-        credentials: true
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
     }));
 }
 app.use(express.json());
